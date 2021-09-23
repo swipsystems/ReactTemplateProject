@@ -11,7 +11,9 @@ namespace ReactTemplateProject.DataLayer.Interfaces
         Task<Boolean> CreateRoleAsync(string roleName);
         List<IdentityRoleDTO> GetRoles();
         List<ApplicationUserDTO> GetUsers();
+        Task<ApplicationUserDTO> GetUserDetailsAsync(string id);
         List<ApplicationUserDTO> SearchUsers(string query);
+        Task<Boolean> EditUserAsync(ApplicationUserDTO dto);
         Task<IdentityRoleDTO> GetRoleDetailsAsync(string roleId);
         Task<bool> RenameRoleAsync(string roleId, string roleName);
         Task<bool> AddUserToRoleAsync(string userId, string roleId);

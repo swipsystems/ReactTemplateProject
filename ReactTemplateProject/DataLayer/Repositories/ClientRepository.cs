@@ -169,5 +169,38 @@ namespace ReactTemplateProject.DataLayer.Repositories
                 throw new Exception("Error in ClientRepository.EditClient - " + ex.Message);
             }
         }
+
+        /// <summary>
+        /// Gets Client Details
+        /// </summary>
+        /// <param name="id"> Client Id </param>
+        /// <returns>
+        /// ClientDTO
+        /// </returns>
+        
+        public ClientDTO GetClientDetails(int id)
+        {
+            try
+            {
+                var client = _db.Clients.FirstOrDefault(i => i.Id == id);
+                if(client != null)
+                {
+                    var dto = new ClientDTO()
+                    {
+                        Id = client.Id,
+                        Name = client.Name
+                    };
+                    return dto;
+                }
+                else
+                {
+                    return new ClientDTO();
+                }
+            }
+            catch(Exception ex)
+            {
+                throw new Exception("Error in ClientRepository.GetClientDetails - " + ex.Message);
+            }
+        }
     }
 }

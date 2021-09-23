@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging;
 using ReactTemplateProject.DataLayer.Interfaces;
 using ReactTemplateProject.Models;
 using ReactTemplateProject.Models.DTOs;
+using ReactTemplateProject.Models.DTOs.Admin;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -292,6 +293,56 @@ namespace ReactTemplateProject.Controllers
             }
         }
 
+        /// <summary>
+        /// If: current user is in Admin role => returns ApplicationUser based on User Id
+        /// Else: returns 403 Forbidden
+        /// </summary>
+        /// <param name="id"> User Id </param>
+        /// <returns>
+        /// Task<IActionResult>
+        /// </returns>
+
+        [HttpGet("GetUserDetailsAsync")]
+        public async Task<IActionResult> GetUserDetailsAsync(string id)
+        {
+            try
+            {
+                if (await IsAdminUser())
+                    return Ok(await _adminRepo.GetUserDetailsAsync(id));
+                else
+                    return StatusCode(403);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex);
+            }
+        }
+
+        /// <summary>
+        /// If: current user is in Admin role => Edits existing ApplicationUser based on User Id
+        /// Else: returns 403 Forbidden
+        /// </summary>
+        /// <param name="dto"> ApplicationUserDTO </param>
+        /// <returns>
+        /// Task<IActionResult>
+        /// </returns>
+
+        [HttpPost("EditUserAsync")]
+        public async Task<IActionResult> EditUserAsync(ApplicationUserDTO dto)
+        {
+            try
+            {
+                if (await IsAdminUser())
+                    return Ok(await _adminRepo.EditUserAsync(dto));
+                else
+                    return StatusCode(403);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex);
+            }
+        }
+
         #endregion
 
         #region Clients
@@ -341,6 +392,31 @@ namespace ReactTemplateProject.Controllers
                     return StatusCode(403);
             }
             catch (Exception ex)
+            {
+                return StatusCode(500, ex);
+            }
+        }
+
+        /// <summary>
+        /// If: current user is in Admin role => Gets Client Details
+        /// Else: returns 403 Forbidden
+        /// </summary>
+        /// <param name="id"> Client Id </param>
+        /// <returns>
+        /// Task<IActionResult>
+        /// </returns>
+
+        [HttpGet("GetClientDetailsAsync")]
+        public async Task<IActionResult> GetClientDetails(int id)
+        {
+            try
+            {
+                if (await IsAdminUser())
+                    return Ok(_clientRepo.GetClientDetails(id));
+                else
+                    return StatusCode(403);
+            }
+            catch(Exception ex)
             {
                 return StatusCode(500, ex);
             }

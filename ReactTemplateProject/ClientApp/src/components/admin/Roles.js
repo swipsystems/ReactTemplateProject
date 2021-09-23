@@ -28,13 +28,14 @@ export class Roles extends Component {
             <div>
                 <Container style={{ marginTop: '50px' }}>
                     <Row>
-                        <Col xl='10'>
+                        <Col xl='10' lg='10' md='10' sm='10' xs='10'>
                             <h3>Roles</h3>
                         </Col>
-                        <Col xl='2'>
+                        <Col xl='2' lg='2' md='2' sm='2' xs='2'>
                             <Button
                                 color='primary'
                                 onClick={() => this.props.history.push('/admin/roles/create')}
+                                style={{ whiteSpace: 'nowrap' }}
                             >
                                 + Add
                             </Button>

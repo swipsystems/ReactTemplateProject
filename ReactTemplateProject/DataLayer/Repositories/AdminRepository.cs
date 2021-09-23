@@ -113,7 +113,7 @@ namespace ReactTemplateProject.DataLayer.Repositories
                     var au = new ApplicationUserDTO()
                     {
                         Id = user.Id,
-                        Name = user.FirstName + " " + user.LastName
+                        Name = user.UserName
                     };
 
                     if (!await _userManager.IsInRoleAsync(user, role.Name))
@@ -296,6 +296,86 @@ namespace ReactTemplateProject.DataLayer.Repositories
             catch (Exception ex)
             {
                 throw new Exception("Error in AdminRepository.SearchUsers - " + ex.Message);
+            }
+        }
+
+        /// <sumamry>
+        /// Gets ApplicationUsers based on id
+        /// </sumamry>
+        /// <param name="id"> User Id </param>
+        /// <returns>
+        /// ApplicationUserDTO
+        /// </returns>
+
+        public async Task<ApplicationUserDTO> GetUserDetailsAsync(string id)
+        {
+            try
+            {
+                var user = await _userManager.FindByIdAsync(id);
+                if(user != null)
+                {
+                    var dto = new ApplicationUserDTO()
+                    {
+                        Id = user.Id,
+                        UserName = user.UserName,
+                        FirstName = user.FirstName,
+                        LastName = user.LastName,
+                        Email = user.Email,
+                        OfficePhone = user.OfficePhone,
+                        Ext = user.Ext,
+                        HomePhone = user.HomePhone,
+                        MobilePhone = user.MobilePhone,
+                        Active = user.Active
+                    };
+                    return dto;
+                }
+                else
+                {
+                    return new ApplicationUserDTO();
+                }
+            }
+            catch(Exception ex)
+            {
+                throw new Exception("Error in AdminRepository.GetUserDetailsAsync - " + ex.Message);
+            }
+        }
+
+        /// <sumamry>
+        /// Edits ApplicationUsers based on id
+        /// </sumamry>
+        /// <param name="dto"> ApplicationUserDTO </param>
+        /// <returns>
+        /// Boolean
+        /// </returns>
+
+        public async Task<Boolean> EditUserAsync(ApplicationUserDTO dto)
+        {
+            try
+            {
+                var user = await _userManager.FindByIdAsync(dto.Id);                
+                if(user != null)
+                {
+                    user.FirstName = dto.FirstName;
+                    user.LastName = dto.LastName;
+                    user.Email = dto.Email;
+                    user.OfficePhone = dto.OfficePhone;
+                    user.Ext = dto.Ext;
+                    user.HomePhone = dto.HomePhone;
+                    user.MobilePhone = dto.MobilePhone;
+                    user.Active = dto.Active;
+
+                    await _db.SaveChangesAsync();
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+                
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error in AdminRepository.EditUserAsync - " + ex.Message);
             }
         }
 

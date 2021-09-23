@@ -13,5 +13,6 @@ namespace ReactTemplateProject.DataLayer.Interfaces
         List<ClientDTO> SearchClients(string query);
         Boolean AddClient(ClientDTO dto);
         Boolean EditClient(ClientDTO dto);
+        ClientDTO GetClientDetails(int id);
     }
 }

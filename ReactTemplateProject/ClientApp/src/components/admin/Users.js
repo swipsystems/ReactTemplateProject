@@ -3,6 +3,7 @@ import { Container, Row, Col, Input, Table, Button } from 'reactstrap';
 import { Typeahead } from 'react-bootstrap-typeahead';
 import authService from '../api-authorization/AuthorizeService';
 import AdminFunctions from './AdminFunctions';
+import utilities from '../util/utilities';
 
 export class Users extends Component {
     static displayName = Users.name;
@@ -14,8 +15,12 @@ export class Users extends Component {
             users: [],
             search: null,
             clientOptions: [],
-            client: null
+            client: null,
+            height: 0,
+            width: 0
         };
+
+        window.addEventListener('resize', this.setWindowDimensions);        
 
     }
 
@@ -24,6 +29,7 @@ export class Users extends Component {
         if(!isAdmin) {
             this.props.history.push('/accessdenied');
         }
+        this.setWindowDimensions();
         this.getClientDropdown();
         this.getUsers();
     }
@@ -38,25 +44,27 @@ export class Users extends Component {
                         </Col>                        
                     </Row>
                     <Row style={{ marginTop: '20px' }}>
-                        <Col xl='6'>
+                        <Col xl='6' lg='6' md='6' sm='12' xs='12'>
                             <Input
                                 type='text'
                                 onChange={(e) => this.setState({ search: e.target.value })}
                                 name='search'
                                 id='search'
-                                placeholder='Search'
+                                placeholder='Search'                                
+                                style={ this.state.width < utilities.dimensions.LG ? { marginBottom: '20px' } : {}}
                             />
                         </Col>
-                        <Col xs='4'>
+                        <Col xl='4' lg='4' md='6' sm='12' xs='12'>
                             <Typeahead
                                 id='client'
                                 onChange={(selected) => this.setState({ client: selected })}
                                 selected={this.state.client}
                                 options={this.state.clientOptions}
                                 placeholder='Client'
+                                style={ this.state.width < utilities.dimensions.MD ? { marginBottom: '20px' } : {}}
                             />
                         </Col>
-                        <Col xl='1'>
+                        <Col xl='1' lg='1' md='2' sm='2' xs='2'>
                             <Button
                                 color='primary'
                                 onClick={() => this.searchUsers()}
@@ -64,10 +72,10 @@ export class Users extends Component {
                                 Search
                             </Button>
                         </Col>
-                        <Col xl='1'>
+                        <Col xl='1' lg='1' md='2' sm='2' xs='2'>
                             <Button
                                 color='primary'
-                                onClick={() => this.props.history.push({ pathname: '/admin/users/details', state: { hasUser: false }})}
+                                onClick={() => this.props.history.push({ pathname: '/admin/users/details', state: { existingUser: false }})}
                                 style={{ whiteSpace: 'nowrap' }}
                             >
                                 + Add
@@ -89,7 +97,10 @@ export class Users extends Component {
                                 <tbody>
                                     {this.state.users.map((user, i) => {
                                         return (
-                                            <tr key={user.id}>
+                                            <tr
+                                                key={user.id}
+                                                onClick={() => this.handleRowClick(user.id)}
+                                            >
                                                 <td>{user.lastName}</td>
                                                 <td>{user.firstName}</td>
                                                 <td></td>
@@ -102,6 +113,9 @@ export class Users extends Component {
                             </Table>
                         </Col>
                     </Row>
+                    <Row>Height: {this.state.height}px</Row>
+                    <Row>Width: {this.state.width}px</Row>
+                    <Row>Screen Size: {utilities.getScreenWidth()}</Row>
                 </Container>
             </div>
         )
@@ -133,5 +147,19 @@ export class Users extends Component {
         const data = await response.json();
         this.setState({ users: data });
     }
+
+    handleRowClick(userId) {
+        this.props.history.push({
+            pathname: '/admin/users/details',
+            state: { userId: userId, existingUser: true }
+        })
+    }
+
+    setWindowDimensions = () => {
+        this.setState({
+            height: window.innerHeight,
+            width: window.innerWidth
+        });
+    };
 
 }

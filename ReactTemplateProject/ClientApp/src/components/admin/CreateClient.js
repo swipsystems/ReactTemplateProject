@@ -3,16 +3,16 @@ import { Container, Row, Col, Input, Button, Alert } from 'reactstrap';
 import authService from '../api-authorization/AuthorizeService';
 import AdminFunctions from './AdminFunctions';
 
-export class CreateRole extends Component {
-    static displayName = CreateRole.name;
+export class CreateClient extends Component {
+    static displayName = CreateClient.name;
 
     constructor(props) {
         super(props);
 
         this.state = {
-            roleName: '',
+            clientName: '',
             success: undefined
-        };
+        }
 
     }
 
@@ -20,7 +20,7 @@ export class CreateRole extends Component {
         const isAdmin = AdminFunctions.isAdminAsync();
         if(!isAdmin) {
             this.props.history.push('/accessdenied');
-        }        
+        }
     }
 
     render() {
@@ -29,23 +29,23 @@ export class CreateRole extends Component {
                 <Container style={{ marginTop: '50px' }}>
                     <Row>
                         <Col>
-                            <h3>Create Role</h3>
+                            <h3>Create Client</h3>
                         </Col>
                     </Row>
                     <Row style={{ marginTop: '20px' }}>
-                        <Col xl='10'>
+                        <Col xl='10' lg='10' md='10' sm='10' xs='10'>
                             <Input
                                 type='text'
-                                onChange={(e) => this.setState({ roleName: e.target.value })}
-                                name='roleName'
-                                id='roleName'
-                                placeholder='Role Name'
+                                onChange={(e) => this.setState({ clientName: e.target.value })}
+                                name='clientName'
+                                id='clientName'
+                                placeholder='Name'
                             />
                         </Col>
-                        <Col xl='2'>
+                        <Col xl='2' lg='2' md='2' sm='2' xs='2'>
                             <Button
                                 color='primary'
-                                onClick={() => this.createRole()}
+                                onClick={() => this.createClient()}
                             >
                                 Create
                             </Button>
@@ -55,12 +55,12 @@ export class CreateRole extends Component {
                         <Col>
                             {this.state.success === true && (
                                 <Alert color='success'>
-                                    Role added successfully!
+                                    Client added successfully!
                                 </Alert>
                             )}                            
                             {this.state.success === false && (
                                 <Alert color='danger'>
-                                    Error adding role!
+                                    Error adding Client!
                                 </Alert>
                             )}
                         </Col>
@@ -70,14 +70,22 @@ export class CreateRole extends Component {
         )
     }
 
-    async createRole() {        
+    async createClient() {
         debugger
         const token = await authService.getAccessToken();
-        const response = await fetch(`api/Admin/CreateRoleAsync?roleName=${this.state.roleName}`, {
-            headers: !token ? {} : { 'Authorization': `Bearer ${token}` }
-        });
-        const data = await response.json();
-        this.setState({ success: data });
+        const name = this.state.clientName;
+        if(name) {
+            const dto = {
+                id: 0,
+                name: name
+            };
+            const response = await fetch('api/Admin/AddClientAsync', {
+                method: 'POST',
+                body: JSON.stringify(dto),
+                headers: !token ? {} : { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' }
+            });
+            const data = await response.json();
+            this.setState({ success: data });
+        }
     }
-
 }

@@ -3,6 +3,7 @@ import { Container, Row, Col, Input, Table, Button } from 'reactstrap';
 import { Typeahead } from 'react-bootstrap-typeahead';
 import authService from '../api-authorization/AuthorizeService';
 import AdminFunctions from './AdminFunctions';
+import utilities from '../util/utilities';
 
 export class Clients extends Component {
     static displayName = Clients.name;
@@ -12,9 +13,12 @@ export class Clients extends Component {
 
         this.state = {
             search: null,
-            clients: []
+            clients: [],
+            height: 0,
+            width: 0
         };
 
+        window.addEventListener('resize', this.setWindowDimensions);        
     }
 
     async componentDidMount() {
@@ -22,7 +26,8 @@ export class Clients extends Component {
         if(!isAdmin) {
             this.props.history.push('/accessdenied');
         }
-        this.getClients();
+        this.setWindowDimensions();
+        this.getClients();        
     }
 
     render() {
@@ -35,16 +40,17 @@ export class Clients extends Component {
                         </Col>
                     </Row>
                     <Row style={{ marginTop: '20px' }}>
-                        <Col xl='10'>
+                        <Col xl='10' lg='10' md='12' sm='12' xs='12'>
                             <Input
                                 type='text'
                                 onChange={(e) => this.setState({ search: e.target.value })}
                                 name='search'
                                 id='search'
                                 placeholder='Search'
+                                style={ this.state.width < utilities.dimensions.LG ? { marginBottom: '20px' } : {}}
                             />
                         </Col>
-                        <Col xl='1'>
+                        <Col xl='1' lg='1' md='2' sm='2' xs='2'>
                             <Button
                                 color='primary'
                                 onClick={() => this.searchClients()}
@@ -52,10 +58,11 @@ export class Clients extends Component {
                                 Search
                             </Button>
                         </Col>
-                        <Col xl='1'>
+                        <Col xl='1' lg='1' md='2' sm='2' xs='2'>
                             <Button
                                 color='primary'
                                 style={{ whiteSpace: 'nowrap' }}
+                                onClick={() => this.props.history.push('/admin/clients/create')}
                             >
                                 + Add
                             </Button>
@@ -73,7 +80,10 @@ export class Clients extends Component {
                                 <tbody>
                                     {this.state.clients.map((client,  i) => {
                                         return (
-                                            <tr key={client.id}>
+                                            <tr
+                                                key={client.id}
+                                                onClick={() => this.handleRowClick(client.id)}
+                                            >
                                                 <td>{client.id}</td>
                                                 <td>{client.name}</td>
                                             </tr>
@@ -82,7 +92,7 @@ export class Clients extends Component {
                                 </tbody>
                             </Table>
                         </Col>
-                    </Row>
+                    </Row>                    
                 </Container>
             </div>
         )
@@ -105,4 +115,18 @@ export class Clients extends Component {
         const data = await response.json();
         this.setState({ clients: data });
     }
+
+    handleRowClick(clientId) {
+        this.props.history.push({
+            pathname: '/admin/clients/details',
+            state: { clientId: clientId, existingClient: true }
+        });
+    }
+
+    setWindowDimensions = () => {
+        this.setState({
+            height: window.innerHeight,
+            width: window.innerWidth
+        });
+    };
 }
